@@ -81,8 +81,8 @@ export default function PromptGenerator() {
         kedalaman: '- **Level Materi**:',
         panjang: '- **Target Panjang**:',
         bahasa: '- **Bahasa**:',
-        sertakanLatihan: 'Latihan/Soal:',
-        sertakanReferensi: 'Daftar Referensi:'
+        sertakanReferensi: 'Daftar Referensi:',
+        manualInput: '' // Handled dynamically
     };
 
     // Helper to handle param changes
@@ -164,8 +164,16 @@ export default function PromptGenerator() {
                 const elHeight = el.clientHeight;
                 const containerHeight = container.clientHeight;
 
-                // Calculate target scroll position (center the element)
-                const targetScroll = elTop - (containerHeight / 2) + (elHeight / 2);
+                let targetScroll;
+
+                // Special handling for manual input: follow the bottom if growing
+                if (lastAction === 'manualInput' && elHeight > containerHeight / 2) {
+                    // Scroll to show the bottom of the element with some padding
+                    targetScroll = elTop + elHeight - containerHeight + 100;
+                } else {
+                    // Default: center the element
+                    targetScroll = elTop - (containerHeight / 2) + (elHeight / 2);
+                }
 
                 container.scrollTo({
                     top: targetScroll,
@@ -183,6 +191,7 @@ export default function PromptGenerator() {
         if (!lastAction) return generatedPrompt;
 
         let keyword = SEARCH_KEYS[lastAction];
+        let isManualHighlight = false;
 
         // Dynamic keywords
         if (lastAction === 'sertakanLatihan') {
@@ -191,15 +200,28 @@ export default function PromptGenerator() {
         if (lastAction === 'sertakanReferensi') {
             keyword = sertakanReferensi ? '### Daftar Referensi' : '### Anti-Hallucination:';
         }
+        if (lastAction === 'manualInput') {
+            // For manual input, we highlight the content itself if present
+            if (!rpsContent.trim()) return generatedPrompt;
+            keyword = rpsContent.trim();
+            isManualHighlight = true;
+        }
 
         if (!keyword) return generatedPrompt;
 
         const index = generatedPrompt.indexOf(keyword);
         if (index === -1) return generatedPrompt;
 
-        // Determine end index: highlight until newline
-        let endIndex = generatedPrompt.indexOf('\n', index);
-        if (endIndex === -1) endIndex = generatedPrompt.length;
+        // Determine end index
+        let endIndex;
+        if (isManualHighlight) {
+            // Highlight the full content length for manual input
+            endIndex = index + keyword.length;
+        } else {
+            // Standard behavior: highlight until newline
+            endIndex = generatedPrompt.indexOf('\n', index);
+            if (endIndex === -1) endIndex = generatedPrompt.length;
+        }
 
         const before = generatedPrompt.substring(0, index);
         const match = generatedPrompt.substring(index, endIndex);
@@ -375,7 +397,7 @@ export default function PromptGenerator() {
                                     </div>
                                     <textarea
                                         value={rpsContent}
-                                        onChange={(e) => setRpsContent(e.target.value)}
+                                        onChange={(e) => handleParamChange('manualInput', e.target.value, setRpsContent)}
                                         placeholder="Contoh:
 1. Pengenalan Digital Marketing
 2. SEO dan SEM
