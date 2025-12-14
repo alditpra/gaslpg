@@ -253,7 +253,7 @@ export default function PromptGenerator() {
                         Generative AI Support for Lecture Prompt Generation by alditpra
                     </p>
                     <p className="text-slate-500 mt-2 text-sm max-w-xl mx-auto">
-                        Tools merancang prompt AI yang presisi guna menghasilkan Modul Ajar, Buku Teks, atau Slide Presentasi berbasis RPS 🙈
+                        Tools merancang prompt AI yang presisi guna menghasilkan Modul Ajar, Buku Teks, atau Slide Presentasi 🙈
                     </p>
                 </header>
 
@@ -277,10 +277,10 @@ export default function PromptGenerator() {
                                 >
                                     <List className="w-4 h-4" />
                                     Manual Topik
-                                    <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                                    <span className="absolute -top-2 -right-2 flex h-5 w-5">
                                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
-                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-sky-500 items-center justify-center">
-                                            <span className="text-[10px] leading-none">👍</span>
+                                        <span className="relative inline-flex rounded-full h-5 w-5 bg-sky-500 items-center justify-center">
+                                            <span className="text-xs leading-none">👍</span>
                                         </span>
                                     </span>
                                 </button>
