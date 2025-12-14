@@ -5,12 +5,12 @@
   --foreground: #ededed;
 }
 
-@theme inline {
+/* @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
+} */
 
 body {
   background: var(--background);
@@ -210,6 +210,7 @@ body {
 .line-clamp-4 {
   display: -webkit-box;
   -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

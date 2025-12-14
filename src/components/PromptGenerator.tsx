@@ -10,7 +10,8 @@ import {
     Sparkles,
     AlertCircle,
     X,
-    Info
+    Info,
+    List
 } from 'lucide-react';
 import { parseDocx } from '@/lib/docxParser';
 import {
@@ -27,7 +28,7 @@ import {
 } from '@/lib/promptGenerator';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 
-type InputMode = 'upload' | 'paste';
+type InputMode = 'upload' | 'paste' | 'manual';
 
 // Tooltip component
 function Tooltip({ text }: { text: string }) {
@@ -46,7 +47,7 @@ export default function PromptGenerator() {
     const [rpsContent, setRpsContent] = useLocalStorage<string>('rps-content', '');
 
     // UI State
-    const [inputMode, setInputMode] = useState<InputMode>('upload');
+    const [inputMode, setInputMode] = useState<InputMode>('manual');
     const [isUploading, setIsUploading] = useState(false);
     const [uploadedFileName, setUploadedFileName] = useState<string>('');
     const [copied, setCopied] = useState(false);
@@ -143,12 +144,11 @@ export default function PromptGenerator() {
             analogi,
             gayaTulis,
             sertakanLatihan,
-            sertakanReferensi
+            sertakanReferensi,
+            isManualMode: inputMode === 'manual'
         });
-    }, [rpsContent, pertemuan, topik, jenjang, gaya, kedalaman, panjang, bahasa, sapaan, analogi, gayaTulis, sertakanLatihan, sertakanReferensi]);
+    }, [rpsContent, pertemuan, topik, jenjang, gaya, kedalaman, panjang, bahasa, sapaan, analogi, gayaTulis, sertakanLatihan, sertakanReferensi, inputMode]);
 
-    // Auto-scroll Effect
-    // Auto-scroll Effect
     // Auto-scroll Effect
     useEffect(() => {
         if (!lastAction) return;
@@ -219,8 +219,6 @@ export default function PromptGenerator() {
         );
     };
 
-
-
     const wordCount = useMemo(() => countWords(generatedPrompt), [generatedPrompt]);
 
     // Copy to Clipboard
@@ -236,7 +234,7 @@ export default function PromptGenerator() {
         }
     }, [generatedPrompt]);
 
-    const isFormValid = rpsContent.trim().length > 0 && pertemuan > 0;
+    const isFormValid = rpsContent.trim().length > 0 && (inputMode === 'manual' || pertemuan > 0);
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-950 via-sky-950 to-slate-950">
@@ -266,11 +264,26 @@ export default function PromptGenerator() {
                         <section className="card">
                             <div className="card-header">
                                 <span className="step-badge">1</span>
-                                <h2 className="card-title">Input Konteks RPS</h2>
+                                <h2 className="card-title">
+                                    {inputMode === 'manual' ? 'Input Topik / Outline' : 'Input Konteks RPS'}
+                                </h2>
                             </div>
 
                             {/* Tab Switcher */}
                             <div className="flex gap-2 mb-4">
+                                <button
+                                    onClick={() => setInputMode('manual')}
+                                    className={`tab-btn relative ${inputMode === 'manual' ? 'tab-btn-active' : ''}`}
+                                >
+                                    <List className="w-4 h-4" />
+                                    Manual Topik
+                                    <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sky-400 opacity-75"></span>
+                                        <span className="relative inline-flex rounded-full h-4 w-4 bg-sky-500 items-center justify-center">
+                                            <span className="text-[10px] leading-none">👍</span>
+                                        </span>
+                                    </span>
+                                </button>
                                 <button
                                     onClick={() => setInputMode('upload')}
                                     className={`tab-btn ${inputMode === 'upload' ? 'tab-btn-active' : ''}`}
@@ -283,7 +296,7 @@ export default function PromptGenerator() {
                                     className={`tab-btn ${inputMode === 'paste' ? 'tab-btn-active' : ''}`}
                                 >
                                     <FileText className="w-4 h-4" />
-                                    Paste Teks
+                                    Paste RPS
                                 </button>
                             </div>
 
@@ -354,8 +367,34 @@ export default function PromptGenerator() {
                                 </div>
                             )}
 
-                            {/* RPS Preview */}
-                            {rpsContent && (
+                            {/* Manual Mode */}
+                            {inputMode === 'manual' && (
+                                <div className="space-y-2">
+                                    <div className="bg-sky-900/20 border border-sky-500/30 p-3 rounded-lg text-sm text-sky-200 mb-2">
+                                        <p><strong>Mode Manual:</strong> Masukkan langsung daftar isi, outline, atau topik spesifik yang ingin Anda kembangkan menjadi materi.</p>
+                                    </div>
+                                    <textarea
+                                        value={rpsContent}
+                                        onChange={(e) => setRpsContent(e.target.value)}
+                                        placeholder="Contoh:
+1. Pengenalan Digital Marketing
+2. SEO dan SEM
+3. Social Media Strategy..."
+                                        className="input-textarea min-h-[200px] resize-y"
+                                    />
+                                    <div className="flex justify-between text-sm text-slate-500">
+                                        <span>{rpsContent.length.toLocaleString()} karakter</span>
+                                        {rpsContent && (
+                                            <button onClick={handleClear} className="text-red-400 hover:text-red-300 transition-colors">
+                                                Hapus semua
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* RPS Preview (Only show in context mode) */}
+                            {rpsContent && inputMode !== 'manual' && (
                                 <div className="mt-4 p-4 bg-slate-800/50 rounded-lg border border-slate-700">
                                     <h3 className="text-sm font-medium text-slate-400 mb-2">Preview RPS:</h3>
                                     <p className="text-slate-300 text-sm line-clamp-4">
@@ -365,46 +404,48 @@ export default function PromptGenerator() {
                             )}
                         </section>
 
-                        {/* Step 2: Target Meeting */}
-                        <section className="card">
-                            <div className="card-header">
-                                <span className="step-badge">2</span>
-                                <h2 className="card-title">Target Pertemuan</h2>
-                            </div>
+                        {/* Step 2: Target Meeting (Hidden in Manual Mode) */}
+                        {inputMode !== 'manual' && (
+                            <section className="card">
+                                <div className="card-header">
+                                    <span className="step-badge">2</span>
+                                    <h2 className="card-title">Target Pertemuan</h2>
+                                </div>
 
-                            <div className="grid md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="input-label">
-                                        Pertemuan Ke- <span className="text-red-400">*</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        min={1}
-                                        max={16}
-                                        value={pertemuan}
-                                        onChange={(e) => setPertemuan(Math.max(1, parseInt(e.target.value) || 1))}
-                                        className="input-field"
-                                    />
+                                <div className="grid md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="input-label">
+                                            Pertemuan Ke- <span className="text-red-400">*</span>
+                                        </label>
+                                        <input
+                                            type="number"
+                                            min={1}
+                                            max={16}
+                                            value={pertemuan}
+                                            onChange={(e) => setPertemuan(Math.max(1, parseInt(e.target.value) || 1))}
+                                            className="input-field"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="input-label">
+                                            Topik/Sub-Bahasan <span className="text-slate-500">(Opsional)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={topik}
+                                            onChange={(e) => setTopik(e.target.value)}
+                                            placeholder="Kosongkan jika ingin AI mencari dari RPS"
+                                            className="input-field"
+                                        />
+                                    </div>
                                 </div>
-                                <div>
-                                    <label className="input-label">
-                                        Topik/Sub-Bahasan <span className="text-slate-500">(Opsional)</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={topik}
-                                        onChange={(e) => setTopik(e.target.value)}
-                                        placeholder="Kosongkan jika ingin AI mencari dari RPS"
-                                        className="input-field"
-                                    />
-                                </div>
-                            </div>
-                        </section>
+                            </section>
+                        )}
 
                         {/* Step 3: Parameters */}
                         <section className="card">
                             <div className="card-header">
-                                <span className="step-badge">3</span>
+                                <span className="step-badge">{inputMode === 'manual' ? 2 : 3}</span>
                                 <h2 className="card-title">Parameter Materi</h2>
                             </div>
 
@@ -562,7 +603,7 @@ export default function PromptGenerator() {
                             </div>
 
                             {/* Checkbox for Referensi with Warning */}
-                            <div className="space-y-2">
+                            <div className="space-y-2 mt-4">
                                 <div
                                     className="flex items-center gap-3 p-3 bg-slate-800/30 rounded-lg border border-slate-700 hover:border-sky-500/50 transition-colors"
                                     onMouseEnter={() => handleParamHover('sertakanReferensi')}
@@ -596,7 +637,7 @@ export default function PromptGenerator() {
                         {/* Step 4: Output */}
                         <section className="card h-full">
                             <div className="card-header">
-                                <span className="step-badge">4</span>
+                                <span className="step-badge">{inputMode === 'manual' ? 3 : 4}</span>
                                 <h2 className="card-title">Prompt Output</h2>
                                 {generatedPrompt && (
                                     <div className="ml-auto flex items-center gap-4">
@@ -627,7 +668,7 @@ export default function PromptGenerator() {
                             {!isFormValid ? (
                                 <div className="flex flex-col items-center justify-center py-12 text-slate-500">
                                     <Sparkles className="w-12 h-12 mb-3 opacity-50" />
-                                    <p>Masukkan RPS untuk melihat preview prompt</p>
+                                    <p>Masukkan RPS atau Topik untuk melihat preview prompt</p>
                                 </div>
                             ) : (
                                 <div className="relative">
@@ -637,7 +678,6 @@ export default function PromptGenerator() {
                                 </div>
                             )}
                         </section>
-
                     </div>
                 </div>
 

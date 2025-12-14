@@ -21,6 +21,7 @@ export interface PromptParams {
     gayaTulis: GayaTulis;
     sertakanLatihan: boolean;
     sertakanReferensi: boolean;
+    isManualMode?: boolean;
 }
 
 const JENJANG_CONTEXT: Record<Jenjang, string> = {
@@ -97,24 +98,38 @@ Bertindaklah sebagai dosen perguruan tinggi Indonesia yang berpengalaman dalam m
 **Penggunaan Analogi:** ${ANALOGI_INSTRUCTION[analogi]}
 **Gaya Penulisan:** ${GAYATULIS_INSTRUCTION[gayaTulis]}`);
 
-    // 2. KONTEKS RPS (DATA UTAMA)
-    parts.push(`## KONTEKS RPS (DATA UTAMA)
+    // 2. KONTEKS & TUGAS
+    if (params.isManualMode) {
+        // Mode Manual: Topik menjadi konteks utama
+        parts.push(`## TOPIK / OUTLINE MATERI (INPUT MANUAL)
+Berikut adalah topik atau outline materi yang harus dikembangkan menjadi dokumen pembelajaran lengkap:
+
+--- MULAI TOPIK ---
+${rpsContent}
+--- AKHIR TOPIK ---`);
+
+        parts.push(`## TUGAS UTAMA
+Buatlah DOKUMEN MATERI PEMBELAJARAN berdasarkan topik/outline di atas. Kembangkan setiap poin menjadi materi yang daging dan komprehensif.`);
+
+    } else {
+        // Mode RPS: Konteks RPS + Pertemuan
+        parts.push(`## KONTEKS RPS (DATA UTAMA)
 Berikut adalah Rencana Pembelajaran Semester (RPS) lengkap untuk mata kuliah ini sebagai konteks utama:
 
 --- AWAL RPS ---
 ${rpsContent}
 --- AKHIR RPS ---`);
 
-    // 3. TUGAS UTAMA
-    let tugasUtama = `## TUGAS UTAMA
+        let tugasUtama = `## TUGAS UTAMA
 Buatlah DOKUMEN MATERI PEMBELAJARAN (Modul Ajar) hanya untuk **PERTEMUAN KE-${pertemuan}**.`;
 
-    if (topik && topik.trim()) {
-        tugasUtama += `\nDengan fokus bahasan: **${topik.trim()}**`;
-    } else {
-        tugasUtama += `\nCari dan identifikasi topik pembelajaran untuk pertemuan ke-${pertemuan} dari RPS yang diberikan.`;
+        if (topik && topik.trim()) {
+            tugasUtama += `\nDengan fokus bahasan: **${topik.trim()}**`;
+        } else {
+            tugasUtama += `\nCari dan identifikasi topik pembelajaran untuk pertemuan ke-${pertemuan} dari RPS yang diberikan.`;
+        }
+        parts.push(tugasUtama);
     }
-    parts.push(tugasUtama);
 
     // 4. PARAMETER USER
     const bahasaInstruction = bahasa === 'Mixed'
