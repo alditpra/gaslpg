@@ -251,8 +251,11 @@ export default function PromptGenerator() {
                             GAS LPG
                         </h1>
                     </div>
-                    <p className="text-slate-400 max-w-2xl mx-auto">
+                    <p className="text-slate-400 max-w-2xl mx-auto font-medium">
                         Generative AI Support for Lecture Prompt Generation by alditpra
+                    </p>
+                    <p className="text-slate-500 mt-2 text-sm max-w-xl mx-auto">
+                        Tools merancang prompt AI yang presisi guna menghasilkan Modul Ajar, Buku Teks, atau Slide Presentasi berbasis RPS 🙈
                     </p>
                 </header>
 
