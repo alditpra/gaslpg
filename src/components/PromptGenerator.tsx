@@ -393,7 +393,7 @@ export default function PromptGenerator() {
                             {inputMode === 'manual' && (
                                 <div className="space-y-2">
                                     <div className="bg-sky-900/20 border border-sky-500/30 p-3 rounded-lg text-sm text-sky-200 mb-2">
-                                        <p><strong>Mode Manual:</strong> Masukkan langsung daftar isi, outline, atau topik spesifik yang ingin Anda kembangkan menjadi materi.</p>
+                                        <p><strong>Mode Manual:</strong> Masukkan langsung daftar isi, outline, atau topik spesifik yang ingin Anda kembangkan menjadi materi. Rekomendasi ini saja biar prompt ga kepanjangan. </p>
                                     </div>
                                     <textarea
                                         value={rpsContent}
