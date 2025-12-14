@@ -136,6 +136,11 @@ body {
   color: #64748b;
 }
 
+.input-field option {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}
+
 .input-textarea {
   width: 100%;
   padding: 0.75rem 1rem;
