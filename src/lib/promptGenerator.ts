@@ -1,6 +1,6 @@
-export type Jenjang = 'D3' | 'S1' | 'S2';
-export type Gaya = 'Teoretis' | 'Praktis' | 'Studi Kasus';
-export type Kedalaman = 'Dasar' | 'Menengah' | 'Lanjut';
+export type Perspektif = 'Umum' | 'Akademis' | 'Industri';
+export type TargetAudiens = 'Pemula' | 'Intermediate' | 'Advanced';
+export type ModelPembelajaran = 'Kasus' | 'Proyek' | 'Masalah' | 'Ceramah';
 export type Panjang = '1000' | '1500' | '2000' | '2500';
 export type Bahasa = 'Indonesia' | 'Mixed';
 export type Sapaan = 'Inklusif' | 'Formal' | 'Netral';
@@ -11,9 +11,10 @@ export interface PromptParams {
     rpsContent: string;
     pertemuan: number;
     topik?: string;
-    jenjang: Jenjang;
-    gaya: Gaya;
-    kedalaman: Kedalaman;
+
+    perspektif: Perspektif;
+    modelPembelajaran: ModelPembelajaran;
+    targetAudiens: TargetAudiens;
     panjang: Panjang;
     bahasa: Bahasa;
     sapaan: Sapaan;
@@ -22,18 +23,20 @@ export interface PromptParams {
     sertakanLatihan: boolean;
     sertakanReferensi: boolean;
     isManualMode?: boolean;
+    konteksKasus?: string;
 }
 
-const JENJANG_CONTEXT: Record<Jenjang, string> = {
-    'D3': 'Fokus pada aspek praktis dan aplikatif. Gunakan bahasa yang sederhana dan langsung. Berikan contoh konkret dari dunia kerja.',
-    'S1': 'Keseimbangan antara teori dan praktik. Gunakan bahasa akademis namun tetap accessible. Sertakan landasan konseptual sebelum aplikasi.',
-    'S2': 'Pendekatan analitis dan kritis. Gunakan referensi jurnal jika relevan. Dorong diskusi mendalam dan pemikiran reflektif.'
+const PERSPEKTIF_CONTEXT: Record<Perspektif, string> = {
+    'Umum': 'Sudut pandang generalis. Fokus pada pemahaman konsep dasar yang bisa diterima semua kalangan tanpa latar belakang teknis yang dalam.',
+    'Akademis': 'Sudut pandang teoritis dan ilmiah. Fokus pada validitas, metodologi, referensi jurnal, dan kerangka berpikir kritis yang ketat.',
+    'Industri': 'Sudut pandang praktisi. Fokus pada best practice, efisiensi kerja, standar industri, dan relevansi pasar kerja saat ini.'
 };
 
-const GAYA_CONTEXT: Record<Gaya, string> = {
-    'Teoretis': 'Fokus pada konsep, definisi, dan landasan teori secara mendalam.',
-    'Praktis': 'Fokus pada aplikasi nyata, contoh konkret, dan panduan how-to.',
-    'Studi Kasus': 'Analisis kasus real-world secara mendalam dengan pembahasan komprehensif.'
+const MODEL_PEMBELAJARAN_CONTEXT: Record<ModelPembelajaran, string> = {
+    'Kasus': 'Studi Kasus (Simulasi). Sajikan materi melalui bedah kasus simulasi [KONTEKS]. Ajak mahasiswa menganalisis situasi, masalah, dan solusi dari kasus tersebut.',
+    'Proyek': 'Project Based Learning (PjBL). Orientasikan materi pada penyelesaian proyek atau penciptaan produk akhir. Fokus pada langkah-langkah praktis pengerjaan.',
+    'Masalah': 'Problem Based Learning (PBL). Mulai dengan masalah pemicu (simulasi) [KONTEKS]. Ajak mahasiswa menelusuri konsep untuk memecahkan masalah tersebut.',
+    'Ceramah': 'Konvensional (Expository). Jelaskan konsep secara berurutan, sistematis, dan deduktif. Fokus pada transfer pengetahuan yang jelas dan terstruktur.'
 };
 
 const SAPAAN_CONTEXT: Record<Sapaan, string> = {
@@ -48,55 +51,66 @@ const ANALOGI_INSTRUCTION: Record<Analogi, string> = {
     'Banyak': 'Gunakan analogi dan perumpamaan secara aktif untuk setiap konsep penting. Hubungkan dengan pengalaman sehari-hari mahasiswa.'
 };
 
-const KEDALAMAN_CONTEXT: Record<Kedalaman, string> = {
-    'Dasar': 'Taksonomi Bloom C1-C2 (Mengingat & Memahami). Fokus pada definisi istilah, penjelasan konsep dasar, identifikasi ciri-ciri, dan pemahaman prinsip utama secara luas.',
-    'Menengah': 'Taksonomi Bloom C3-C4 (Menerapkan & Menganalisis). Fokus pada penerapan konsep dalam situasi nyata, analisis komponen-komponen, studi kasus sederhana, dan pemecahan masalah prosedural.',
-    'Lanjut': 'Taksonomi Bloom C5-C6 (Mengevaluasi & Mencipta). Fokus pada evaluasi kritis terhadap teori, perbandingan pendekatan, sintesis ide dari berbagai sumber, dan perancangan strategi atau solusi baru.'
+const TARGET_AUDIENS_CONTEXT: Record<TargetAudiens, string> = {
+    'Pemula': 'Target: Mahasiswa Semester Awal / Awam. Masih belajar pemahaman dasar. Hindari jargon berlebihan tanpa penjelasan. Fokus pada pemahaman konsep dasar (Bloom C1-C2).',
+    'Intermediate': 'Target: Mahasiswa Semester Tengah. Asumsikan pemahaman dasar sudah ada. Fokus pada penerapan dan analisis (Bloom C3-C4). Gunakan istilah teknis dengan wajar.',
+    'Advanced': 'Target: Mahasiswa Tingkat Akhir / Pascasarjana. Diskusi tingkat tinggi yang menuntut evaluasi dan sintesis (Bloom C5-C6). Tantang pemikiran kritis.'
 };
 
 const GAYATULIS_INSTRUCTION: Record<GayaTulis, string> = {
-    'Modul': 'Gaya MODUL AJAR: Naratif akademis dan ensiklopedis. Penjelasan komprehensif dengan alur logis. Bahasa formal, diksi ringan, dengan elaborasi mendalam seperti buku referensi, tetapi pecah2 menjadi bullet points.',
+    'Modul': 'Gaya MODUL AJAR: Gunakan gaya naratif akademis dan ensiklopedis. Sajikan penjelasan yang komprehensif dengan alur logis dan sistematis. Gunakan bahasa formal dengan diksi yang ringan dan mudah dipahami. Elaborasi konsep secara mendalam seperti buku referensi akademik, namun sajikan dalam bentuk poin-poin terstruktur (bullet points), termasuk bagian pendahuluan',
     'Buku': 'Gaya BUKU TEKS: Naratif akademis dan ensiklopedis. Penjelasan komprehensif dengan alur logis. Bahasa formal dengan elaborasi mendalam seperti buku referensi.',
     'Presentasi': 'Gaya PRESENTASI: Format slide/bullet-points. Ringkas, padat, dan visual. Fokus pada poin-poin kunci dan hierarki informasi yang jelas untuk ditampilkan di layar.'
 };
 
 const PROPORSI_MAP: Record<Panjang, string> = {
-    '1000': `- Pendahuluan: ~100 kata
+    '1000': `- Pendahuluan: ~50 kata
 - Tujuan Pembelajaran: ~50 kata
-- Uraian Materi: ~650 kata
-- Contoh/Studi Kasus: ~150 kata
+- Uraian Materi: ~680 kata
+- Contoh/Studi Kasus: ~170 kata
 - Ringkasan: ~50 kata`,
-    '1500': `- Pendahuluan: ~150 kata
+    '1500': `- Pendahuluan: ~50 kata
 - Tujuan Pembelajaran: ~100 kata
-- Uraian Materi: ~950 kata
-- Contoh/Studi Kasus: ~200 kata
+- Uraian Materi: ~1000 kata
+- Contoh/Studi Kasus: ~250 kata
 - Ringkasan: ~100 kata`,
-    '2000': `- Pendahuluan: ~200 kata
+    '2000': `- Pendahuluan: ~50 kata
 - Tujuan Pembelajaran: ~100 kata
-- Uraian Materi: ~1300 kata
-- Contoh/Studi Kasus: ~300 kata
-- Ringkasan: ~100 kata`,
-    '2500': `- Pendahuluan: ~250 kata
-- Tujuan Pembelajaran: ~150 kata
-- Uraian Materi: ~1600 kata
+- Uraian Materi: ~1400 kata
 - Contoh/Studi Kasus: ~350 kata
+- Ringkasan: ~100 kata`,
+    '2500': `- Pendahuluan: ~50 kata
+- Tujuan Pembelajaran: ~150 kata
+- Uraian Materi: ~1750 kata
+- Contoh/Studi Kasus: ~400 kata
 - Ringkasan: ~150 kata`
 };
 
 export function generatePrompt(params: PromptParams): string {
-    const { rpsContent, pertemuan, topik, jenjang, gaya, kedalaman, panjang, bahasa, sapaan, analogi, gayaTulis, sertakanLatihan, sertakanReferensi } = params;
+    const { rpsContent, pertemuan, topik, perspektif, modelPembelajaran, targetAudiens, panjang, bahasa, sapaan, analogi, gayaTulis, sertakanLatihan, sertakanReferensi, konteksKasus } = params;
 
     const parts: string[] = [];
 
-    // 1. ROLE & PERSONA
+    // Dynamic Context for Case/PBL
+    let modelContext = MODEL_PEMBELAJARAN_CONTEXT[modelPembelajaran];
+    if (modelPembelajaran === 'Kasus' || modelPembelajaran === 'Masalah') {
+        const defaultContext = 'level startup atau umkm bidang agribisnis atau peternakan atau rumah makan atau pendidikan';
+        const usedContext = konteksKasus?.trim() || defaultContext;
+        modelContext = modelContext.replace('[KONTEKS]', usedContext);
+    }
+
     parts.push(`## ROLE & PERSONA
 Bertindaklah sebagai dosen perguruan tinggi Indonesia yang berpengalaman dalam menyusun materi pembelajaran. Gunakan bahasa formal, akademis, namun mudah dipahami oleh mahasiswa.
 
-**Konteks Jenjang ${jenjang}:** ${JENJANG_CONTEXT[jenjang]}
-**Gaya Penyampaian:** ${GAYA_CONTEXT[gaya]}
+## 6 POIN PENTING
+**Perspektif Penjelasan:** ${PERSPEKTIF_CONTEXT[perspektif]}
+**Target Audiens:** ${TARGET_AUDIENS_CONTEXT[targetAudiens]}
+**Model Pembelajaran:** ${modelContext}
 **Gaya Sapaan:** ${SAPAAN_CONTEXT[sapaan]}
 **Penggunaan Analogi:** ${ANALOGI_INSTRUCTION[analogi]}
-**Gaya Penulisan:** ${GAYATULIS_INSTRUCTION[gayaTulis]}`);
+**Gaya Penulisan:** ${GAYATULIS_INSTRUCTION[gayaTulis]} 
+`);
+
 
     // 2. KONTEKS & TUGAS
     if (params.isManualMode) {
@@ -138,12 +152,12 @@ Buatlah DOKUMEN MATERI PEMBELAJARAN (Modul Ajar) hanya untuk **PERTEMUAN KE-${pe
 
     const panjangInstruction = gayaTulis === 'Presentasi'
         ? 'Dinamis (Sesuai kebutuhan materi slide)'
-        : `**MINIMAL ${panjang} kata** (JANGAN kurang, elaborasi sedetail mungkin)`;
+        : `**Sekitar ${panjang} kata** (WAJIB tidak bertele-tele)`;
 
-    parts.push(`## PARAMETER PEMBELAJARAN
-- **Jenjang Pendidikan**: ${jenjang}
-- **Gaya Penyampaian**: ${gaya}
-- **Level Materi**: ${KEDALAMAN_CONTEXT[kedalaman]}
+    parts.push(`## 5 PARAMETER PEMBELAJARAN
+- **Sudut Pandang**: ${perspektif}
+- **Pendekatan**: ${modelPembelajaran}
+- **Level Audiens**: ${targetAudiens}
 - **Target Panjang**: ${panjangInstruction}
 - **Bahasa**: ${bahasaInstruction}`);
 
@@ -154,7 +168,7 @@ Buatlah DOKUMEN MATERI PEMBELAJARAN (Modul Ajar) hanya untuk **PERTEMUAN KE-${pe
         struktur = `- Slide Judul
 - Slide Tujuan Pembelajaran
 - Slide Apersepsi/Pendahuluan
-- Slide Inti Materi (pecah menjadi 5-10 slide)
+- Slide Inti Materi (pecah menjadi 7-13 slide)
 - Slide Studi Kasus/Contoh
 - Slide Ringkasan & Kesimpulan`;
     } else {
@@ -195,10 +209,9 @@ ${outputFormat}
 ### Anti-Hallucination:
 - JANGAN menyebutkan nama buku/referensi yang tidak tercantum di RPS
 - JANGAN membuat kutipan atau sitasi fiktif
-- Jika informasi tidak tersedia di RPS, tulis **[perlu dilengkapi oleh dosen]**
 
 ### Larangan:
-- Hindari bahasa marketing/promosi`;
+- Hindari kreatifitas yang tidak sesuai apa yang saya minta`;
 
     if (!sertakanLatihan) {
         autorules += `\n- Jangan menyertakan soal latihan/kuis`;
@@ -219,8 +232,8 @@ Di akhir dokumen, sertakan bagian **Daftar Referensi** dengan format:
 
     autorules += `
     
-### Saran Penyempurnaan (WAJIB):
-Di bagian paling akhir, berikan 3-5 saran konkret untuk menyempurnakan materi saja. Tawarkan opsi tindak lanjut dengan angka (misal: "Ketik 1 untuk [Saran A]", "Ketik 2 untuk [Saran B]", dst).`;
+### Review Materi (WAJIB):
+Di bagian paling akhir, tawarkan opsi kepada pengguna untuk mengetik **"Ya"** agar Anda (AI) mereview ulang dan merevisi materi tersebut untuk memastikan kesesuaian dengan prompt awal.`;
 
     parts.push(autorules);
 

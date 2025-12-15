@@ -18,9 +18,9 @@ import { parseDocx } from '@/lib/docxParser';
 import {
     generatePrompt,
     countWords,
-    Jenjang,
-    Gaya,
-    Kedalaman,
+    Perspektif,
+    ModelPembelajaran,
+    TargetAudiens,
     Panjang,
     Bahasa,
     Sapaan,
@@ -57,16 +57,17 @@ export default function PromptGenerator() {
     // Form State
     const [pertemuan, setPertemuan] = useState<number>(1);
     const [topik, setTopik] = useState<string>('');
-    const [jenjang, setJenjang] = useState<Jenjang>('S1');
-    const [gaya, setGaya] = useState<Gaya>('Praktis');
-    const [kedalaman, setKedalaman] = useState<Kedalaman>('Menengah');
+    const [perspektif, setPerspektif] = useState<Perspektif>('Industri');
+    const [modelPembelajaran, setModelPembelajaran] = useState<ModelPembelajaran>('Kasus');
+    const [konteksKasus, setKonteksKasus] = useState<string>('');
+    const [targetAudiens, setTargetAudiens] = useState<TargetAudiens>('Pemula');
     const [panjang, setPanjang] = useState<Panjang>('1500');
     const [bahasa, setBahasa] = useState<Bahasa>('Mixed');
     const [sapaan, setSapaan] = useState<Sapaan>('Inklusif');
     const [analogi, setAnalogi] = useState<Analogi>('Tidak');
     const [gayaTulis, setGayaTulis] = useState<GayaTulis>('Modul');
     const [sertakanLatihan, setSertakanLatihan] = useState(false);
-    const [sertakanReferensi, setSertakanReferensi] = useState(false);
+    const [sertakanReferensi, setSertakanReferensi] = useState(true);
 
     // Auto-scroll State
     const outputRef = useRef<HTMLPreElement>(null);
@@ -74,12 +75,14 @@ export default function PromptGenerator() {
 
     // Mapping params to search keywords
     const SEARCH_KEYS: Record<string, string> = {
-        jenjang: '**Konteks Jenjang',
-        gaya: '**Gaya Penyampaian:**',
+        perspektif: '**Perspektif Penjelasan:**',
+        modelPembelajaran: '**Model Pembelajaran:**',
+        targetAudiens: '**Target Audiens:**',
         sapaan: '**Gaya Sapaan:**',
         analogi: '**Penggunaan Analogi:**',
         gayaTulis: '**Gaya Penulisan:**',
-        kedalaman: '- **Level Materi**:',
+        konteksKasus: '**Model Pembelajaran:**',
+
         panjang: '- **Target Panjang**:',
         bahasa: '- **Bahasa**:',
         sertakanReferensi: 'Daftar Referensi:',
@@ -135,10 +138,11 @@ export default function PromptGenerator() {
         return generatePrompt({
             rpsContent,
             pertemuan,
+            konteksKasus: (modelPembelajaran === 'Kasus' || modelPembelajaran === 'Masalah') ? konteksKasus : undefined,
             topik: topik.trim() || undefined,
-            jenjang,
-            gaya,
-            kedalaman,
+            perspektif,
+            modelPembelajaran,
+            targetAudiens,
             panjang,
             bahasa,
             sapaan,
@@ -148,7 +152,7 @@ export default function PromptGenerator() {
             sertakanReferensi,
             isManualMode: inputMode === 'manual'
         });
-    }, [rpsContent, pertemuan, topik, jenjang, gaya, kedalaman, panjang, bahasa, sapaan, analogi, gayaTulis, sertakanLatihan, sertakanReferensi, inputMode]);
+    }, [rpsContent, pertemuan, topik, perspektif, modelPembelajaran, konteksKasus, targetAudiens, panjang, bahasa, sapaan, analogi, gayaTulis, sertakanLatihan, sertakanReferensi, inputMode]);
 
     // Auto-scroll Effect
     useEffect(() => {
@@ -484,50 +488,67 @@ export default function PromptGenerator() {
                             <div className="grid sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-4">
                                 <div>
                                     <label className="input-label flex items-center">
-                                        Jenjang
-                                        <Tooltip text="Level pendidikan mahasiswa" />
+                                        Perspektif
+                                        <Tooltip text="Sudut pandang penjelasan materi" />
                                     </label>
                                     <select
-                                        value={jenjang}
-                                        onChange={(e) => handleParamChange('jenjang', e.target.value as Jenjang, setJenjang)}
-                                        onMouseEnter={() => handleParamHover('jenjang')}
+                                        value={perspektif}
+                                        onChange={(e) => handleParamChange('perspektif', e.target.value as Perspektif, setPerspektif)}
+                                        onMouseEnter={() => handleParamHover('perspektif')}
                                         className="input-field"
                                     >
-                                        <option value="D3">D3 - Praktis/Vokasi</option>
-                                        <option value="S1">S1 - Teori + Praktik</option>
-                                        <option value="S2">S2 - Analitis/Riset</option>
+                                        <option value="Umum">Umum - Generalis</option>
+                                        <option value="Akademis">Akademis - Teoritis/Ilmiah</option>
+                                        <option value="Industri">Industri - Praktisi/Kerja</option>
                                     </select>
                                 </div>
-                                <div>
+                                <div className="transition-all duration-300">
                                     <label className="input-label flex items-center">
-                                        Gaya Penyampaian
-                                        <Tooltip text="Teoretis: konsep & definisi. Praktis: aplikasi & how-to. Studi Kasus: analisis real-world." />
+                                        Model Pembelajaran
+                                        <Tooltip text="Pendekatan penyampaian materi (Studi Kasus, Proyek, dll)" />
                                     </label>
                                     <select
-                                        value={gaya}
-                                        onChange={(e) => handleParamChange('gaya', e.target.value as Gaya, setGaya)}
-                                        onMouseEnter={() => handleParamHover('gaya')}
+                                        value={modelPembelajaran}
+                                        onChange={(e) => handleParamChange('modelPembelajaran', e.target.value as ModelPembelajaran, setModelPembelajaran)}
+                                        onMouseEnter={() => handleParamHover('modelPembelajaran')}
                                         className="input-field"
                                     >
-                                        <option value="Teoretis">Teoretis - Konsep & Definisi</option>
-                                        <option value="Praktis">Praktis - Aplikasi & How-to</option>
-                                        <option value="Studi Kasus">Studi Kasus - Analisis Real-world</option>
+                                        <option value="Ceramah">Konvensional (Ceramah)</option>
+                                        <option value="Kasus">Studi Kasus (Simulasi)</option>
+                                        <option value="Proyek">Project Based (PjBL)</option>
+                                        <option value="Masalah">Problem Based (PBL)</option>
                                     </select>
                                 </div>
+
+                                {/* Conditional Input for Kasus/Masalah (Full Width) */}
+                                {(modelPembelajaran === 'Kasus' || modelPembelajaran === 'Masalah') && (
+                                    <div className="sm:col-span-2 mt-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                                        <label className="input-label flex items-center mb-1 text-sky-300">
+                                            Kustom Kasus / Masalah <span className="text-slate-500 ml-1">(Opsional)</span>
+                                            <Tooltip text="Tentukan konteks spesifik simulasi (misal: Startup Agribisnis, UMKM Kuliner, dll)" />
+                                        </label>
+                                        <textarea
+                                            value={konteksKasus}
+                                            onChange={(e) => handleParamChange('konteksKasus', e.target.value, setKonteksKasus)}
+                                            placeholder="level startup atau umkm bidang agribisnis atau peternakan atau rumah makan atau pendidikan"
+                                            className="input-field text-sm bg-slate-900/50 border-slate-700/50 focus:bg-slate-900 min-h-[80px]"
+                                        />
+                                    </div>
+                                )}
                                 <div>
                                     <label className="input-label flex items-center">
-                                        Level Materi
-                                        <Tooltip text="Kedalaman pembahasan materi" />
+                                        Target Audiens
+                                        <Tooltip text="Untuk siapa materi ini dibuat?" />
                                     </label>
                                     <select
-                                        value={kedalaman}
-                                        onChange={(e) => handleParamChange('kedalaman', e.target.value as Kedalaman, setKedalaman)}
-                                        onMouseEnter={() => handleParamHover('kedalaman')}
+                                        value={targetAudiens}
+                                        onChange={(e) => handleParamChange('targetAudiens', e.target.value as TargetAudiens, setTargetAudiens)}
+                                        onMouseEnter={() => handleParamHover('targetAudiens')}
                                         className="input-field"
                                     >
-                                        <option value="Dasar">Dasar - Pengenalan</option>
-                                        <option value="Menengah">Menengah - Pemahaman</option>
-                                        <option value="Lanjut">Lanjut - Pendalaman</option>
+                                        <option value="Pemula">Pemula (Semester Awal)</option>
+                                        <option value="Intermediate">Intermediate (Sem. Tengah)</option>
+                                        <option value="Advanced">Advanced (Tingkat Akhir)</option>
                                     </select>
                                 </div>
                                 <div>
