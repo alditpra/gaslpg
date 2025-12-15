@@ -172,9 +172,12 @@ Buatlah DOKUMEN MATERI PEMBELAJARAN (Modul Ajar) hanya untuk **PERTEMUAN KE-${pe
         ? '- Output berupa OUTLINE PRESENTASI (Slide-by-Slide)\n- Gunakan bullet points, hindari paragraf panjang'
         : '- Output berupa teks naratif terstruktur (BUKAN slide/PPT)';
 
+    const objectiveRule = '\n### WAJIB: Sertakan "Tujuan Pembelajaran" di bagian paling awal materi.';
     let autorules = `## ATURAN WAJIB (AUTO-RULES)
 
 ${sertakanReferensi ? '**LANGKAH PERTAMA (WAJIB):** Sebelum menulis satu katapun, LAKUKAN PENCARIAN dan PEMBACAAN mendalam terhadap minimal 5-10 referensi kredibel yang relevan. Gunakan informasi dari referensi ini sebagai fondasi materi.\n' : ''}
+${objectiveRule}
+
 ### Struktur Dokumen (dengan Proporsi):
 ${struktur}
 
