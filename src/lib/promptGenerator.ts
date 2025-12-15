@@ -55,7 +55,7 @@ const KEDALAMAN_CONTEXT: Record<Kedalaman, string> = {
 };
 
 const GAYATULIS_INSTRUCTION: Record<GayaTulis, string> = {
-    'Modul': 'Gaya MODUL AJAR: Instruksional dan learning-oriented. Sertakan tujuan pembelajaran di awal, penjelasan step-by-step, dan cek pemahaman. Format modular dengan bagian-bagian yang jelas.',
+    'Modul': 'Gaya MODUL AJAR: Naratif akademis dan ensiklopedis. Penjelasan komprehensif dengan alur logis. Bahasa formal, diksi ringan, dengan elaborasi mendalam seperti buku referensi, tetapi pecah2 menjadi bullet points.',
     'Buku': 'Gaya BUKU TEKS: Naratif akademis dan ensiklopedis. Penjelasan komprehensif dengan alur logis. Bahasa formal dengan elaborasi mendalam seperti buku referensi.',
     'Presentasi': 'Gaya PRESENTASI: Format slide/bullet-points. Ringkas, padat, dan visual. Fokus pada poin-poin kunci dan hierarki informasi yang jelas untuk ditampilkan di layar.'
 };
@@ -158,7 +158,7 @@ Buatlah DOKUMEN MATERI PEMBELAJARAN (Modul Ajar) hanya untuk **PERTEMUAN KE-${pe
 - Slide Studi Kasus/Contoh
 - Slide Ringkasan & Kesimpulan`;
     } else {
-        struktur = PROPORSI_MAP[panjang] + '\n\n**Perhatian**: Pecah setiap poin ulasan materi menjadi paragraf yang mendalam. Jangan hanya membuat listing poin.';
+        struktur = PROPORSI_MAP[panjang] + '\n\n**Perhatian**: Pecah setiap poin ulasan materi menjadi penjelasan mendalam dalam bentuk bullet points yang terstruktur. Pastikan elaborasi tetap komprehensif.';
     }
 
     if (sertakanLatihan) {
@@ -174,6 +174,7 @@ Buatlah DOKUMEN MATERI PEMBELAJARAN (Modul Ajar) hanya untuk **PERTEMUAN KE-${pe
 
     let autorules = `## ATURAN WAJIB (AUTO-RULES)
 
+${sertakanReferensi ? '**LANGKAH PERTAMA (WAJIB):** Sebelum menulis satu katapun, LAKUKAN PENCARIAN dan PEMBACAAN mendalam terhadap minimal 5-10 referensi kredibel yang relevan. Gunakan informasi dari referensi ini sebagai fondasi materi.\n' : ''}
 ### Struktur Dokumen (dengan Proporsi):
 ${struktur}
 
@@ -208,17 +209,15 @@ Di akhir dokumen, sertakan bagian **Daftar Referensi** dengan format:
 - 5-10 link URL lengkap yang relevan dengan materi
 - Tulis URL secara utuh (contoh: "https://jurnal.id/artikel-123")
 - Prioritaskan sumber: jurnal ilmiah, repositori institusi, situs .edu/.ac.id, Wikipedia
-- Format Markdown: \`[Judul Referensi]: https://url-lengkap.com/path/to/resource\` (Agar URL terlihat jelas)
+- Format Referensi: https://url-lengkap-beserta-halaman.com/ (Agar URL terlihat jelas)
 
 **PERINGATAN**: Pastikan URL yang diberikan adalah URL yang BENAR dan EXIST. Verifikasi sebelum menyertakan.`;
     }
 
     autorules += `
     
-### Output Continuity (PENTING):
-Mengingat target panjang dokumen yang tinggi, jika respons terhenti karena batasan token:
-1. Jangan memotong kalimat di tengah kata.
-2. Tulis secara eksplisit di baris terakhir: **"[Materi belum selesai. Ketik 'Lanjutkan' untuk meneruskan ke bagian berikutnya...]"**`;
+### Saran Penyempurnaan (WAJIB):
+Di bagian paling akhir, berikan 3-5 saran konkret untuk menyempurnakan materi saja. Tawarkan opsi tindak lanjut dengan angka (misal: "Ketik 1 untuk [Saran A]", "Ketik 2 untuk [Saran B]", dst).`;
 
     parts.push(autorules);
 
