@@ -11,7 +11,8 @@ import {
     AlertCircle,
     X,
     Info,
-    List
+    List,
+    ArrowUpRight
 } from 'lucide-react';
 import { parseDocx } from '@/lib/docxParser';
 import {
@@ -272,7 +273,16 @@ export default function PromptGenerator() {
                         </h1>
                     </div>
                     <p className="text-slate-400 max-w-2xl mx-auto font-medium">
-                        Generative AI Support for Lecture Prompt Generation by alditpra
+                        Generative AI Support for Lecture Prompt Generation by{' '}
+                        <a
+                            href="https://aldit.pages.dev"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sky-400 hover:text-sky-300 transition-colors inline-flex items-center gap-0.5 hover:underline"
+                        >
+                            alditpra
+                            <ArrowUpRight className="w-3 h-3" />
+                        </a>
                     </p>
                     <p className="text-slate-500 mt-2 text-sm max-w-xl mx-auto">
                         Tools merancang prompt AI yang presisi guna menghasilkan Modul Ajar, Buku Teks, atau Slide Presentasi 🙈
