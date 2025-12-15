@@ -29,7 +29,7 @@ export interface PromptParams {
 const PERSPEKTIF_CONTEXT: Record<Perspektif, string> = {
     'Umum': 'Sudut pandang generalis. Fokus pada pemahaman konsep dasar yang bisa diterima semua kalangan tanpa latar belakang teknis yang dalam.',
     'Akademis': 'Sudut pandang teoritis dan ilmiah. Fokus pada validitas, metodologi, referensi jurnal, dan kerangka berpikir kritis yang ketat.',
-    'Industri': 'Sudut pandang praktisi. Fokus pada best practice, efisiensi kerja, standar industri, dan relevansi pasar kerja saat ini.'
+    'Industri': 'Sudut pandang praktisi. Fokus pada best practice, efisiensi kerja, standar dunia kerja, dan relevansi pasar kerja saat ini.'
 };
 
 const MODEL_PEMBELAJARAN_CONTEXT: Record<ModelPembelajaran, string> = {
@@ -100,7 +100,7 @@ export function generatePrompt(params: PromptParams): string {
     }
 
     parts.push(`## ROLE & PERSONA
-Bertindaklah sebagai dosen perguruan tinggi Indonesia yang berpengalaman dalam menyusun materi pembelajaran. Gunakan bahasa formal, akademis, namun mudah dipahami oleh mahasiswa.
+Bertindaklah sebagai dosen perguruan tinggi Indonesia yang berpengalaman dalam menyusun materi pembelajaran. Gunakan bahasa formal, akademis, dan natural, namun mudah dipahami oleh mahasiswa.
 
 ## 6 POIN PENTING
 **Perspektif Penjelasan:** ${PERSPEKTIF_CONTEXT[perspektif]}
@@ -211,7 +211,11 @@ ${outputFormat}
 - JANGAN membuat kutipan atau sitasi fiktif
 
 ### Larangan:
-- Hindari kreatifitas yang tidak sesuai apa yang saya minta`;
+- Jangan menuliskan angka kuantitatif apa pun. Hindari seluruh bentuk numerik, termasuk nominal uang, jumlah, persentase, durasi waktu, perhitungan, rasio, maupun satuan kuantitatif lainnya. Gunakan deskripsi kualitatif atau istilah umum tanpa angka.
+- Jangan menulis kalimat klise, aforisme, atau narasi populer yang sering muncul dalam artikel motivasi atau opini bisnis. Hindari diksi persuasif dan metaforis. Gunakan pernyataan faktual, definisional, dan analitis secara langsung.
+- Jangan mengulang kalimat yang ada di prompt ini.
+`;
+
 
     if (!sertakanLatihan) {
         autorules += `\n- Jangan menyertakan soal latihan/kuis`;
@@ -220,7 +224,7 @@ ${outputFormat}
     if (sertakanReferensi) {
         autorules += `
 
-### Daftar Referensi (WAJIB jika diminta):
+### Daftar Referensi:
 Di akhir dokumen, sertakan bagian **Daftar Referensi** dengan format:
 - 5-10 link URL lengkap yang relevan dengan materi
 - Tulis URL secara utuh (contoh: "https://jurnal.id/artikel-123")
@@ -233,7 +237,7 @@ Di akhir dokumen, sertakan bagian **Daftar Referensi** dengan format:
     autorules += `
     
 ### Review Materi (WAJIB):
-Di bagian paling akhir, tawarkan opsi kepada pengguna untuk mengetik **"Ya"** agar Anda (AI) mereview ulang dan merevisi materi tersebut untuk memastikan kesesuaian dengan prompt awal.`;
+Pada bagian akhir respons, selalu tawarkan kepada pengguna opsi untuk mengetik “Ya” agar AI meninjau ulang dan merevisi materi guna memastikan kesesuaian dengan prompt atau instruksi awal.`;
 
     parts.push(autorules);
 
