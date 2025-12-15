@@ -228,8 +228,7 @@ ${outputFormat}
 Di akhir dokumen, sertakan bagian **Daftar Referensi** dengan format:
 - 5-10 link URL lengkap yang relevan dengan materi
 - Tulis URL secara utuh (contoh: "https://jurnal.id/artikel-123")
-- Prioritaskan sumber: jurnal ilmiah, repositori institusi, situs .edu/.ac.id, Wikipedia
-- Format Referensi: https://url-lengkap-beserta-halaman.com/ (Agar URL terlihat jelas)
+- Format Referensi: https://url-lengkap-beserta-halaman.com/artikel123 (Agar URL terlihat jelas)
 
 **PERINGATAN**: Pastikan URL yang diberikan adalah URL yang BENAR dan EXIST. Verifikasi sebelum menyertakan.`;
     }
